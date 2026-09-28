@@ -352,16 +352,18 @@
 
   function renderMatrix() {
     var cells = state.matrix;
-    el.matrixVeil.hidden = !(state.awaitingGuess && cells);
+    // In guess-first mode keep the cover up from the moment a street is dealt
+    // until its guess is in, so nothing flashes underneath.
+    el.matrixVeil.hidden = !(state.guessMode && !state.guessed[state.street]);
     if (!cells) {
       if (!el.matrix.children.length) {
         for (var i = 0; i < 169; i++) {
           var d = document.createElement('div');
-          d.className = 'cell dead';
+          d.className = 'cell pending';
           el.matrix.appendChild(d);
         }
       } else {
-        for (i = 0; i < 169; i++) { el.matrix.children[i].className = 'cell dead'; el.matrix.children[i].style.background = ''; }
+        for (i = 0; i < 169; i++) { el.matrix.children[i].className = 'cell pending'; el.matrix.children[i].style.background = ''; el.matrix.children[i].title = ''; }
       }
       el.matrixFoot.textContent = state.computing ? 'Computing\u2026' : '';
       return;
@@ -515,6 +517,17 @@
     renderChart();
     renderMatrix();
     updateButtons();
+  });
+  // Only allow a number from 0 to 100 with at most one decimal place.
+  el.guessInput.addEventListener('input', function () {
+    var v = el.guessInput.value.replace(/[^0-9.]/g, '');
+    var parts = v.split('.');
+    var whole = parts[0].slice(0, 3);
+    var frac = parts.length > 1 ? parts[1].slice(0, 1) : null;
+    if (whole && parseInt(whole, 10) > 100) whole = '100';
+    v = frac === null ? whole : whole + '.' + frac;
+    if (whole === '100' && frac) v = '100';
+    if (v !== el.guessInput.value) el.guessInput.value = v;
   });
   el.guessSubmit.addEventListener('click', submitGuess);
   el.guessInput.addEventListener('keydown', function (e) {

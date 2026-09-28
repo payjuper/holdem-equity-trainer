@@ -76,7 +76,7 @@
       <div class="guess" id="guess-box" hidden>
         <label for="guess-input">Your estimate</label>
         <div class="guess-row">
-          <input type="number" id="guess-input" min="0" max="100" step="0.1" placeholder="0 to 100" autocomplete="off">
+          <input type="text" inputmode="decimal" id="guess-input" maxlength="5" placeholder="0 to 100" autocomplete="off" aria-label="Your win probability estimate, 0 to 100">
           <span>%</span>
           <button id="guess-submit" class="primary small">Reveal</button>
         </div>
