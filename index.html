@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hold'em Equity Trainer</title>
+<meta name="description" content="Monte Carlo equity calculator for Texas Hold'em: deal a hand, reveal the board street by street, and watch your win probability move. Includes standard error, an opponent-holdings matrix, and a guess-first practice mode.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%231f5c3b'/%3E%3Crect x='17' y='10' width='30' height='44' rx='5' fill='%23fbfaf7'/%3E%3Ctext x='32' y='40' font-family='Georgia,serif' font-size='26' font-weight='700' text-anchor='middle' fill='%23b8262d'%3EA%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <h1>Hold'em Equity Trainer</h1>
+    <span class="sub">Monte Carlo win probability, street by street</span>
+  </div>
+  <div class="controls">
+    <label for="opponents">Opponents</label>
+    <select id="opponents">
+      <option value="1">1</option>
+      <option value="2">2</option>
+      <option value="3">3</option>
+    </select>
+    <label class="toggle" for="guessMode"><input type="checkbox" id="guessMode"><span class="switch"></span><span class="toggle-text">Guess first</span></label>
+  </div>
+</header>
+
+<main class="layout">
+  <section class="table">
+   <aside class="matrix-col">
+    <div class="eyebrow">Opponent holdings</div>
+    <div class="matrix-sub">Your equity against each possible hand (one opponent). Hover a cell for details.</div>
+    <div class="matrix-wrap">
+      <div class="matrix" id="matrix"></div>
+      <div class="legend">
+        <div class="scale"><div class="scale-bar"></div>
+          <div class="scale-ticks"><span>0%</span><span>25%</span><span>50%</span><span>75%</span><span>100%</span></div>
+          <div class="scale-words"><span>behind (&lt;45%)</span><span>coin flip</span><span>ahead (&gt;55%)</span></div>
+        </div>
+        <div class="legend-dead"><i class="cell dead demo">AA</i> impossible: one of those cards is already out</div>
+      </div>
+      <div class="matrix-foot" id="matrix-foot"></div>
+      <div class="veil" id="matrix-veil" hidden>Hidden until you enter your guess</div>
+    </div>
+   </aside>
+   <div class="center-col">
+    <div class="opponents" id="opponents-row"></div>
+
+    <div class="felt">
+      <div class="felt-label" id="street-label">Board · preflop</div>
+      <div class="board" id="board"></div>
+      <div class="showdown" id="showdown" hidden></div>
+    </div>
+
+    <div class="hero-row">
+      <div class="hero">
+        <div class="who">You</div>
+        <div class="hole" id="hole"></div>
+      </div>
+      <div class="actions">
+        <button id="deal" class="primary">Deal flop</button>
+        <button id="new" class="secondary">New hand</button>
+        <div class="hint"><kbd>Space</kbd> deal &nbsp; <kbd>N</kbd> new hand</div>
+      </div>
+    </div>
+   </div>
+  </section>
+
+  <aside class="panel">
+    <div class="stat">
+      <div class="eyebrow">Win probability</div>
+      <div class="headline" id="big-pct"><span class="num">--</span><span class="pct">%</span></div>
+      <div class="guess" id="guess-box" hidden>
+        <label for="guess-input">Your estimate</label>
+        <div class="guess-row">
+          <input type="number" id="guess-input" min="0" max="100" step="0.1" placeholder="0 to 100" autocomplete="off">
+          <span>%</span>
+          <button id="guess-submit" class="primary small">Reveal</button>
+        </div>
+      </div>
+      <div class="bar"><div class="bar-win" id="bar-win"></div><div class="bar-tie" id="bar-tie"></div></div>
+      <div class="wtl">
+        <div>win <span id="win-pct">--</span></div>
+        <div>tie <span id="tie-pct">--</span></div>
+        <div>lose <span id="lose-pct">--</span></div>
+      </div>
+      <div class="guess-result" id="guess-result"></div>
+    </div>
+
+    <div class="hand-box">
+      <div class="eyebrow small">Current hand</div>
+      <div class="hand-name" id="hand-name">--</div>
+      <div class="hand-draw" id="hand-draw"></div>
+    </div>
+
+    <div class="chart-box">
+      <div class="eyebrow">Equity by street</div>
+      <svg id="chart" viewBox="0 0 336 150" xmlns="http://www.w3.org/2000/svg" aria-label="Equity by street line chart"></svg>
+      <div class="chart-note" id="chart-note">Watch how the number moves as each card lands.</div>
+    </div>
+
+    <div class="footer">
+      <div id="foot-trials">Monte Carlo · 20,000 trials</div>
+      <div id="foot-err">±--</div>
+      <div id="foot-mae"></div>
+    </div>
+  </aside>
+</main>
+
+<script src="poker.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
